@@ -1,8 +1,9 @@
 const path = require('path')
 const fs = require('fs')
 const axios = require('axios')
+const createConfig  = require('./createConfig')
 
-const rootcode = '530000'
+
 
 const fetchFn = async (code, dirPath, hasChildren = true) => {
     const url = `https://geo.datav.aliyun.com/areas_v3/bound/${code}${hasChildren?'_full':''}.json`
@@ -12,6 +13,7 @@ const fetchFn = async (code, dirPath, hasChildren = true) => {
             if (err) {
                 console.log(`${code}.json 文件写入失败: ${err}`)
             }
+            console.log(`${code}.json 文件写入成功`)
         }) 
         const {features} = data
         if (features[0]['properties']['adcode'] !== code) {
@@ -27,11 +29,12 @@ const fetchFn = async (code, dirPath, hasChildren = true) => {
 }
 
 const run = async () => {
-   const dirPath = path.resolve(__dirname,'云南')
+    const config = await createConfig()
+   const dirPath = path.resolve(__dirname, config.dirname)
    // 创建之前先检测目录是否已经存在
    try {
     fs.accessSync(dirPath)
-    fetchFn(rootcode, dirPath)
+    fetchFn(config.rootCode, dirPath)
    } catch (error) {
     // 不存在则创建       
     fs.mkdirSync(dirPath)
@@ -46,7 +49,7 @@ const generateJsonMap = (code, name) => {
     codemapjson[code] = name
     treecodemap[name] = code
     const content = imports + '\n\n\n\n' + `export const codemapjson = ${JSON.stringify(codemapjson)}` + '\n\n\n\n' + `export const treecodemap = ${JSON.stringify(treecodemap)}`
-    fs.writeFile(path.resolve(__dirname, 'codemapjson.js'), content, err => {
+    fs.writeFile(path.resolve(__dirname, 'codemap.js'), content, err => {
         if (err) console.log(err)
     })
 }
