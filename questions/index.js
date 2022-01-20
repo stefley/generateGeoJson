@@ -11,3 +11,10 @@ exports.rootCodeQuestion = () => ({
     default: '100000',
     message: '输入需要获取地图数据的adcode'
 })
+
+exports.rootAreaNameQuestion = () => ({
+    type: 'input',
+    name: 'rootAreaName',
+    defalut: '中国',
+    message: '输入需要获取地图数据的行政名称（如陕西省）'
+})
